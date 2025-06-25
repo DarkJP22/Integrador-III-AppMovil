@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Doctor Blue</string>
+    <string name="title_activity_main">Doctor Blue</string>
+    <string name="package_name">com.doctorbluecr.app</string>
+    <string name="custom_url_scheme">com.doctorbluecr.app</string>
+</resources>

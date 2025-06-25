@@ -1,0 +1,77 @@
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router';
+import { SplashScreen } from "@capacitor/splash-screen";
+import { IonicVue } from '@ionic/vue';
+import { QueryClient, VueQueryPlugin, VueQueryPluginOptions } from "@tanstack/vue-query";
+
+/* Core CSS required for Ionic components to work properly */
+import '@ionic/vue/css/core.css';
+
+/* Basic CSS for apps built with Ionic */
+import '@ionic/vue/css/normalize.css';
+import '@ionic/vue/css/structure.css';
+import '@ionic/vue/css/typography.css';
+
+/* Optional CSS utils that can be commented out */
+import '@ionic/vue/css/padding.css';
+import '@ionic/vue/css/float-elements.css';
+import '@ionic/vue/css/text-alignment.css';
+import '@ionic/vue/css/text-transformation.css';
+import '@ionic/vue/css/flex-utils.css';
+import '@ionic/vue/css/display.css';
+
+/* Theme variables */
+import './theme/variables.css';
+
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+import { register as registerSwiper } from 'swiper/element/bundle';
+// register Swiper custom elements
+registerSwiper();
+// Call the element loader after the platform has been bootstrapped
+defineCustomElements(window);
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    mutations: {
+      networkMode: 'always',
+    },
+    queries: {
+      networkMode: 'always',
+      gcTime: 1000 * 60, // 1 min
+      retry: 2,
+      refetchOnReconnect: true,
+    },
+  },
+});
+const vueQueryOptions: VueQueryPluginOptions = {
+  queryClient: queryClient,
+  enableDevtoolsV6Plugin: true,
+}
+
+const app = createApp(App)
+  .use(IonicVue)
+  .use(router)
+  .use(VueQueryPlugin, vueQueryOptions);
+  
+  // VueQueryPlugin.install(app,{
+  //   queryClientConfig:{
+  //     defaultOptions:{
+  //       queries:{
+  //         cacheTime: 1000 * 60, //1 min
+  //       }
+  //     }
+  //   }
+  // });
+  
+router.isReady().then(() => {
+  app.mount('#app');
+});
+
+window.addEventListener('load', ()=>{
+  document.addEventListener('deviceready', deviceReadyInit, false)
+});
+
+async function deviceReadyInit(){
+  await SplashScreen.hide()
+}

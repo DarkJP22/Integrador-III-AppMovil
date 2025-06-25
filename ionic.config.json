@@ -1,0 +1,7 @@
+{
+  "name": "doctorblue",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
