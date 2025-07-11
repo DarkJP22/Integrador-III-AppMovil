@@ -230,6 +230,13 @@ export default [
         component: () => import('@/modules/patient/views/LabPage.vue'),
         meta: { requiresAuth: false }
     },
-   
+    //This route is for the affiliate patient
+    {
+        path: '/patient/affiliation',
+        name: 'affiliation',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/AffiliationPage.vue'),
+        meta: { requiresAuth: false }
+    },
 
 ]

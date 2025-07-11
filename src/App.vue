@@ -69,6 +69,7 @@ import {
   notificationsOutline,
   notificationsSharp,
   personCircleOutline,
+  personAddOutline,
   personCircleSharp,
   logOutOutline,
   logOutSharp,
@@ -159,6 +160,12 @@ export default defineComponent({
         url: "/patient/account",
         iosIcon: personCircleOutline,
         mdIcon: personCircleSharp,
+      },
+       {
+        title: "Afiliación",
+        url: "/patient/affiliation",
+        iosIcon: personAddOutline,
+        mdIcon: personAddOutline,
       },
     ];
 
