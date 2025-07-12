@@ -170,4 +170,6 @@ const onRefresh = async () => {
 onIonViewDidEnter(async () => {
   clearNotifications();
 });
+
+//Prueba xd
 </script>
