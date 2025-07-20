@@ -31,26 +31,10 @@
         </ion-content>
       </ion-popover>
     </ion-content>
-    <ion-content>
+  
+      <div class="home-page ion-padding grid h-full place-items-center">
       <ion-grid class="mb-24">
-      <ion-row class="ion-justify-content-center" color="primary">
-        <ion-col class="" size-md="12" size-lg="12" size-xs="12">
-          <ion-button color="primary" expand="block" size="large" fill="solid" shape="round" :router-link="'/patient/expedient/' + currentPatient.id + '/signs'">
-            Afiliarse
-          </ion-button>
-            </ion-col>
-        </ion-row>
-      <ion-row class="ion-justify-content-center" color="primary">
-        <ion-col class="" size-md="12" size-lg="12" size-xs="12">
-          <ion-button color="primary" expand="block" size="large" fill="outline" shape="round" :router-link="'/patient/home/'">
-            Cancelar
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-    </ion-content>
-    <ion-content> 
-      <ion-row class="ion-justify-content-center ion-align-items-center" color="primary">
+         <ion-row class="ion-justify-content-center ion-align-items-center" color="primary">
             <ion-col class="" size-md="12" size-lg="12" size-xs="12">
               <div class="ion-text-center">
                 <img v-if="darkModeActive" src="@/assets/logo-white.png" alt="Doctor Blue" class="logo inline-block w-32" />
@@ -59,7 +43,44 @@
 
             </ion-col>
           </ion-row>
-          </ion-content>
+      <ion-row class="ion-justify-content-center" color="primary">
+        <ion-col class="" size-md="12" size-lg="12" size-xs="12">
+          <ion-button color="primary" expand="block" size="large" fill="solid" shape="round" @click="isOpenModal = true">
+        Afiliarse
+          </ion-button>
+          <ion-modal ref="loginModal" :is-open="isOpenModal" @willDismiss="onWillDismiss">
+        <ion-header>
+          <ion-toolbar color="primary">
+            <ion-buttons slot="start">
+          <ion-button @click="cancel()">Cerrar</ion-button>
+            </ion-buttons>
+            <ion-title>Términos y Condiciones</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <h3>Términos y Condiciones</h3>
+          <p>
+            Aquí van los términos y condiciones de afiliación. Por favor, léelos cuidadosamente antes de continuar.
+          </p>
+          <div class="ion-padding">
+            <ion-button expand="block" shape="round" color="primary" @click="acceptTerms">
+          Aceptar y continuar
+            </ion-button>
+          </div>
+        </ion-content>
+          </ion-modal>
+        </ion-col>
+      </ion-row>
+      <ion-row class="ion-justify-content-center" color="primary">
+        <ion-col class="" size-md="12" size-lg="12" size-xs="12">
+          <ion-button color="primary" expand="block" size="large" fill="outline" shape="round" :router-link="'/patient/home/'">
+            Cancelar
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+       </div>
+          
 </ion-page>
 </template>
 
@@ -93,13 +114,14 @@ chevronDownOutline
 } from "ionicons/icons";
 import { computed, onMounted, onUnmounted, watch } from "vue";
 import { ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 import useAllergies from "../composables/useAllergies";
 import usePatients from "../composables/usePatients";
 import useAuth from "@/modules/auth/composables/useAuth";
 import { useMyBroadcastEvents } from "@/composables/useMyBroadcastEvents";
 const isOpenRef = ref(false);
-
+const isOpenModal = ref(false);
+const router = useRouter();
 const form = ref({
   name: "",
 });
@@ -138,6 +160,21 @@ const changePatient = (patient: any) => {
 
 const currentPatientName = computed(() => currentPatient.value.name);
 
+function onWillDismiss() {
+  isOpenModal.value = false;
+}
+function acceptTerms() {
+  isOpenModal.value = false;
+
+   
+  router.push('/patient/affiliation/register');
+}
+
+
+function cancel() {
+  isOpenModal.value = false;
+}
+
 </script>
 <style scoped>
 .logo {
@@ -159,5 +196,11 @@ const currentPatientName = computed(() => currentPatient.value.name);
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.home-page {
+  /* display: grid;
+  place-items: center; */
+  padding-top: 6rem;
+  width: 100%;
 }
 </style>

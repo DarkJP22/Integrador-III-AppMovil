@@ -238,5 +238,26 @@ export default [
         component: () => import('@/modules/patient/views/AffiliationPage.vue'),
         meta: { requiresAuth: false }
     },
-
+    {
+        path: '/patient/affiliation/terms',
+        name: 'affiliation-terms',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/AffiliationTermsConditions.vue'),
+        meta: { requiresAuth: false }
+    },
+    {
+        path: '/patient/affiliation/search',
+        name: 'affiliation-search',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/AffiliationSearchPage.vue'),
+        meta: { requiresAuth: false }
+    },
+    
+    {
+        path: '/patient/affiliation/register',
+        name: 'affiliation-register',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/AffiliationRegister.Page.vue'),
+        meta: { requiresAuth: false }
+    }
 ]
