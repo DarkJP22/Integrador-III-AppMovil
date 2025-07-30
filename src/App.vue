@@ -51,6 +51,7 @@ import {
   IonMenuToggle,
   IonNote,
   IonRouterOutlet,
+  IonSpinner,
   IonSplitPane,
 } from "@ionic/vue";
 import { computed, defineComponent, onMounted, ref } from "vue";
@@ -78,6 +79,8 @@ import {
   lockClosedSharp,
   shareSocialOutline,
   shareSocialSharp,
+  cartSharp,
+  cartOutline,
 
 } from "ionicons/icons";
 import useAuth from "@/modules/auth/composables/useAuth";
@@ -160,6 +163,12 @@ export default defineComponent({
         iosIcon: personCircleOutline,
         mdIcon: personCircleSharp,
       },
+      {
+        title: "Farmacias",
+        url: "/patient/branches",
+        iosIcon: cartOutline,
+        mdIcon: cartSharp,
+      }
     ];
 
     const pagesMedic = [

@@ -229,7 +229,19 @@ export default [
         beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
         component: () => import('@/modules/patient/views/LabPage.vue'),
         meta: { requiresAuth: false }
-    },
+    },{
+        path: '/patient/branches',
+        name: 'branches',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/BranchesPage.vue'),
+        meta: { requiresAuth: false}
+    },{
+        path: '/patient/drugs/:pharmacyId',
+        name: 'drugs-pharmacy',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/DrugsPage.vue'),
+        meta: { requiresAuth: false }
+    }
    
 
 ]
