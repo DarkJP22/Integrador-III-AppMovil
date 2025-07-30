@@ -12,8 +12,9 @@
                 <h3>TIPO DE SUSCRIPCIÓN</h3>
                 <ion-item lines="none" class="affiliation-select">
                     <ion-select v-model="form.type_affiliation" interface="action-sheet" placeholder="Selecciona tipo">
-                        <ion-select-option value="1">BASICO</ion-select-option>
-                        <ion-select-option value="2">PREMIUM</ion-select-option>
+                        <ion-select-option value="Basic">BASICO</ion-select-option>
+                        <ion-select-option value="Standard">STANDARD</ion-select-option>
+                        <ion-select-option value="Premium">PREMIUM</ion-select-option>
                     </ion-select>
                 </ion-item>
                 <div class="affiliation-input">
@@ -74,10 +75,9 @@ const userId = 1; // Replace with actual user id from auth/session
 const { createAffiliation, isLoading, errors } = useAffiliation(userId);
 
 const form = ref({
-    type_affiliation: "1",
-    phone: "45454454",
+    type_affiliation: "",
+    phone: "",
     voucher: null as File | null,
-    date: "2024-06-01",
     active: true,
 });
 
@@ -99,15 +99,14 @@ function onFileChange(event: Event) {
 }
 
 async function onSubmit() {
-    if (!form.value.phone || !form.value.voucher) {
+    if (!form.value.type_affiliation|| !form.value.voucher) {
         alert("Por favor, completa todos los campos y sube una foto.");
         return;
     }
     const formData = new FormData();
-    formData.append("date", "2024-06-01");
     formData.append("type_affiliation", form.value.type_affiliation);
     formData.append("voucher", form.value.voucher);
-   alert("Enviando datos de afiliación..." + form.value.voucher);
+  alert("Enviando datos de afiliación..." + form.value.type_affiliation);
     const result = await createAffiliation(formData);
     if (result.ok) {
         router.push("/patient/home/");
