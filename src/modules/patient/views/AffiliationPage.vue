@@ -54,14 +54,16 @@
             <ion-buttons slot="start">
           <ion-button @click="cancel()">Cerrar</ion-button>
             </ion-buttons>
-            <ion-title>Términos y Condiciones</ion-title>
+           
           </ion-toolbar>
         </ion-header>
         <ion-content class="ion-padding">
-          <h3>Términos y Condiciones</h3>
-          <p>
-            Aquí van los términos y condiciones de afiliación. Por favor, léelos cuidadosamente antes de continuar.
-          </p>
+          <div class="max-w-2xl mx-auto px-6 py-6 border border-gray-300 text-gray-800 dark:text-gray-100 rounded-xl bg-white/70 dark:bg-black/30 dark:border-gray-800 text-center">
+             <h3 class="text-xl font-semibold mb-4">Términos y Condiciones</h3>
+                <p>
+                  Aquí van los términos y condiciones de afiliación. Por favor, léelos cuidadosamente antes de continuar.
+                 </p>
+             </div>
           <div class="ion-padding">
             <ion-button expand="block" shape="round" color="primary" @click="acceptTerms">
           Aceptar y continuar
