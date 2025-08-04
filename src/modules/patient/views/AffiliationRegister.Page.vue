@@ -19,92 +19,83 @@
                 </div>
                 <ion-item lines="none" class="affiliation-select">
                     <ion-select v-model="form.type_affiliation" interface="action-sheet" placeholder="Selecciona tipo afiliación" class="ion-text-center">
-                        <ion-select-option value="Basic">BASICO</ion-select-option>
-                        <ion-select-option value="Standard">STANDARD</ion-select-option>
-                        <ion-select-option value="Premium">PREMIUM</ion-select-option>
+                        <ion-select-option value="Monthly">Mensual</ion-select-option>
+                        <ion-select-option value="Semi-Annually">Semestral</ion-select-option>
+                        <ion-select-option value="Annually">Anual</ion-select-option>
                     </ion-select>
                 </ion-item>
                 <div class="space-y-4 mt-4" v-if="form.type_affiliation">
   <div
-    v-if="form.type_affiliation === 'Basic'"
+    v-if="form.type_affiliation === 'Monthly'"
     class="flex items-center justify-between max-w-2xl px-2 py-6 mx-auto border border-gray-300 text-gray-300 cursor-pointer rounded-xl dark:border-gray-800 bg-white/10"
   >
-    <!-- Contenido BÁSICO -->
+    <!-- Contenido Mensual -->
     <div class="flex items-center">
       <svg class="w-5 h-5 text-gray-400 sm:h-9 sm:w-9" fill="currentColor" viewBox="0 0 20 20">
         <path clip-rule="evenodd" fill-rule="evenodd"
           d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
       </svg>
       <div class="flex flex-col items-start mx-2 space-y-2">
-        <h2 class="text-2xl font-medium text-gray-700 dark:text-gray-200">BÁSICO</h2>
-        <div class="px-1 text-xs text-gray-700">(Visible para recibir citas)</div>
+        <h2 class="text-2xl font-medium text-gray-700 dark:text-gray-200">Mensual</h2>
+        <div class="px-1 text-xs text-white-700">Costo Mensual de 2,000 mil colones</div>
       </div>
     </div>
     <div class="flex flex-col space-y-2 text-center">
-      <h2 class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">
-        Uso plataforma <strong>Gratis 1er Año</strong> - Después $0.00 /Mes
-      </h2>
-      <h2 class="text-xs font-bold text-gray-700 dark:text-white">+ Comisión por cita:</h2>
-      <div class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">Médico General: $25.00</div>
-      <div class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">Médico Especialista: $35.00</div>
+      <h2 class="text-xs font-bold text-gray-700 dark:text-white">Beneficios </h2>
+      <div class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">Descuento de Laboratorios</div>
+      <div class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">Descuento en atención medica </div>
       <div class="flex items-center justify-center gap-1 text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">
-        Descuento x Cita: 10% <span class="font-bold">(opcional)</span>
+        Descuento x Cita: 10% <span class="font-bold"></span>
       </div>
     </div>
   </div>
 
   <div
-    v-else-if="form.type_affiliation === 'Standard'"
+    v-else-if="form.type_affiliation === 'Semi-Annually'"
     class="flex items-center justify-between max-w-2xl px-2 py-6 mx-auto border border-gray-300 text-gray-300 cursor-pointer rounded-xl dark:border-gray-800 bg-white/10"
   >
-    <!-- Contenido STANDARD -->
+    <!-- Contenido Semestral -->
     <div class="flex items-center">
       <svg class="w-5 h-5 text-gray-400 sm:h-9 sm:w-9" fill="currentColor" viewBox="0 0 20 20">
         <path clip-rule="evenodd" fill-rule="evenodd"
           d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
       </svg>
-      <div class="flex flex-col items-start mx-2 space-y-2">
-        <h2 class="text-2xl font-medium text-gray-700 dark:text-gray-200">STANDARD</h2>
-        <div class="px-1 text-xs text-gray-700">(Más visibilidad y beneficios)</div>
+    <div class="flex flex-col items-start mx-2 space-y-2">
+        <h2 class="text-2xl font-medium text-gray-700 dark:text-gray-200">Semestral</h2>
+        <div class="px-1 text-xs text-white-700">Costo Semestral de 10,000 mil colones</div>
       </div>
     </div>
     <div class="flex flex-col space-y-2 text-center">
-      <h2 class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">
-        $5.00 /Mes
-      </h2>
-      <h2 class="text-xs font-bold text-gray-700 dark:text-white">+ Comisión por cita:</h2>
-      <div class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">Médico General: $20.00</div>
-      <div class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">Médico Especialista: $30.00</div>
+      <h2 class="text-xs font-bold text-gray-700 dark:text-white">Beneficios </h2>
+      <div class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">Descuento de Laboratorios</div>
+      <div class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">Descuento en atención medica </div>
       <div class="flex items-center justify-center gap-1 text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">
-        Descuento x Cita: 20%
+        Descuento x Cita: 10% <span class="font-bold"></span>
       </div>
     </div>
   </div>
 
   <div
-    v-else-if="form.type_affiliation === 'Premium'"
+    v-else-if="form.type_affiliation === 'Annually'"
     class="flex items-center justify-between max-w-2xl px-2 py-6 mx-auto border border-yellow-300 text-gray-300 cursor-pointer rounded-xl dark:border-yellow-500 bg-yellow-50/10"
   >
-    <!-- Contenido PREMIUM -->
+    <!-- Contenido Anual -->
     <div class="flex items-center">
       <svg class="w-5 h-5 text-yellow-400 sm:h-9 sm:w-9" fill="currentColor" viewBox="0 0 20 20">
         <path clip-rule="evenodd" fill-rule="evenodd"
           d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
       </svg>
-      <div class="flex flex-col items-start mx-2 space-y-2">
-        <h2 class="text-2xl font-medium text-yellow-600 dark:text-yellow-300">PREMIUM</h2>
-        <div class="px-1 text-xs text-yellow-600">(Máxima exposición y beneficios)</div>
+     <div class="flex flex-col items-start mx-2 space-y-2">
+        <h2 class="text-2xl font-medium text-gray-700 dark:text-gray-200">Anual</h2>
+        <div class="px-1 text-xs text-white-700">Costo Anual de 30,000 mil colones</div>
       </div>
     </div>
     <div class="flex flex-col space-y-2 text-center">
-      <h2 class="text-xs text-yellow-600 bg-yellow-100 rounded-full px-2 py-1">
-        $9.99 /Mes
-      </h2>
-      <h2 class="text-xs font-bold text-yellow-700 dark:text-yellow-400">+ Comisión por cita:</h2>
-      <div class="text-xs text-yellow-600 bg-yellow-100 rounded-full px-2 py-1">Médico General: $15.00</div>
-      <div class="text-xs text-yellow-600 bg-yellow-100 rounded-full px-2 py-1">Médico Especialista: $25.00</div>
-      <div class="flex items-center justify-center gap-1 text-xs text-yellow-600 bg-yellow-100 rounded-full px-2 py-1">
-        Descuento x Cita: 30%
+      <h2 class="text-xs font-bold text-gray-700 dark:text-white">Beneficios </h2>
+      <div class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">Descuento de Laboratorios</div>
+      <div class="text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">Descuento en atención medica </div>
+      <div class="flex items-center justify-center gap-1 text-xs text-teal-600 bg-teal-100 rounded-full px-2 py-1">
+        Descuento x Cita: 10% <span class="font-bold"></span>
       </div>
     </div>
   </div>
@@ -184,6 +175,10 @@ function onFileChange(event: Event) {
 }
 
 async function onSubmit() {
+   if(!confirm("¿Estás seguro de que deseas enviar los datos de afiliación?")) {
+        return;
+    }
+
     if (!form.value.type_affiliation|| !form.value.voucher) {
         alert("Por favor, completa todos los campos y sube una foto.");
         return;
@@ -191,7 +186,6 @@ async function onSubmit() {
     const formData = new FormData();
     formData.append("type_affiliation", form.value.type_affiliation);
     formData.append("voucher", form.value.voucher);
-  alert("Enviando datos de afiliación..." + form.value.type_affiliation);
     const result = await createAffiliation(formData);
     if (result.ok) {
         router.push("/patient/home/");

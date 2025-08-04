@@ -53,11 +53,12 @@ const useAffiliation = (userId: number) => {
             affiliations.value = []
             const { data } = await gpsApi.get(`/affiliation-users/${id}`)
             // Retorna true si hay al menos una afiliación activa, false si no
-        const hasActive = data.active === 1;
-            affiliations.value = data
             isLoading.value = false
-           //  alert("Obteniendo afiliaciones del usuario..."+ hasActive);
-            return hasActive
+              if (data && typeof data === 'object' && 'active' in data) {
+            return data.active 
+        }
+            alert("No se encontraron afiliaciones activas para el usuario.");
+            return false
         } catch (error) {
             isLoading.value = false
             throw error

@@ -253,17 +253,24 @@ const {getAffiliationsByUser, isLoading, errors } = useAffiliation(auth.value.us
     onMounted(async() => {
       configIni();
       checkForUpdate();
-     const result = await getAffiliationsByUser(auth.value.user?.id);
+     const result   = await getAffiliationsByUser(auth.value.user?.id);
   const affiliationItem = pagesPatient.find(page => page.title === "Afiliación");
 
-  if (result === true) {
+  if (result === "Approved") {
     //alert("Afiliación cargada correctamente");
     Affiliationtrue.value = true;
     if (affiliationItem) {
       affiliationItem.url = "/patient/affiliation/search";
     }
-  } else {
+  } else if (result === "Pending") {
+    alert("Afiliación en proceso de aprobación");
     Affiliationtrue.value = false;
+    if (affiliationItem) {
+      affiliationItem.url = "/patient/affiliation";
+    }
+  } else {
+     alert("No se encontraron afiliaciones activas para el usuario.");
+      Affiliationtrue.value = false;
     if (affiliationItem) {
       affiliationItem.url = "/patient/affiliation";
     }
