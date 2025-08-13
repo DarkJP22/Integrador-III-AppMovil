@@ -145,11 +145,18 @@ import {
 import { ref } from "vue";
 import useAffiliation from "../composables/useAffiliation";
 import { useRouter } from "vue-router";
-
+import useUi  from "@/composables/useUi";
+const { alertMessage , confirmDialog } = useUi();
 const router = useRouter();
 const userId = 1; // Replace with actual user id from auth/session
 const { createAffiliation, isLoading, errors } = useAffiliation(userId);
 
+const enviarDatosAfiliacion = async (): Promise<boolean> => {
+  return await confirmDialog(
+    "Confirmación",
+    "¿Estás seguro de que deseas enviar los datos de afiliación?"
+  );
+};
 const form = ref({
     type_affiliation: "",
     phone: "",
@@ -175,9 +182,9 @@ function onFileChange(event: Event) {
 }
 
 async function onSubmit() {
-   if(!confirm("¿Estás seguro de que deseas enviar los datos de afiliación?")) {
-        return;
-    }
+  if (!await enviarDatosAfiliacion()) {
+  return;
+}
 
     if (!form.value.type_affiliation|| !form.value.voucher) {
         alert("Por favor, completa todos los campos y sube una foto.");
