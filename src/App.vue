@@ -70,6 +70,7 @@ import {
   notificationsOutline,
   notificationsSharp,
   personCircleOutline,
+  personAddOutline,
   personCircleSharp,
   logOutOutline,
   logOutSharp,
@@ -84,9 +85,11 @@ import {
 
 } from "ionicons/icons";
 import useAuth from "@/modules/auth/composables/useAuth";
+import useAffiliation from './modules/patient/composables/useAffiliation';
 import useAppUpdater from "@/composables/useAppUpdater";
 import usePushNotifications from "./composables/usePushNotifications";
 import useUtilities from "./composables/useUtilities";
+
 //import { useMyBroadcastEvents } from "./composables/useMyBroadcastEvents";
 
 export default defineComponent({
@@ -113,8 +116,9 @@ export default defineComponent({
     //const { logout: broadcastLogout } = useMyBroadcastEvents();
     const { supportLink } = useUtilities();
     const selectedIndex = ref(0);
-
-    const pagesPatient = [
+const {getAffiliationsByUser, isLoading, errors } = useAffiliation(auth.value.user?.id);
+ const Affiliationtrue =  ref<boolean>(false);
+    const pagesPatient  = [
       {
         title: "Inicio",
         url: "/patient/home",
@@ -164,11 +168,19 @@ export default defineComponent({
         mdIcon: personCircleSharp,
       },
       {
+
         title: "Farmacias",
         url: "/patient/branches",
         iosIcon: cartOutline,
         mdIcon: cartSharp,
-      }
+      },
+      {
+        title: "Afiliación",
+        url:  "/patient/affiliation",
+        iosIcon: personAddOutline,
+        mdIcon: personAddOutline,
+      },
+
     ];
 
     const pagesMedic = [
@@ -225,12 +237,16 @@ export default defineComponent({
     ];
 
     const appPages = computed(() => {
+
       if (auth.value.isMedic) {
         return pagesMedic;
       }
       return pagesPatient;
     });
+    //Esto es modificación de rama G1
 
+
+  // FIN de modificación de rama G1
     const path = window.location.pathname.split("/")[1];
     if (path !== undefined) {
       selectedIndex.value = appPages.value.findIndex(
@@ -245,9 +261,31 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
 
-    onMounted(() => {
+    onMounted(async() => {
       configIni();
       checkForUpdate();
+     const result   = await getAffiliationsByUser(auth.value.user?.id);
+  const affiliationItem = pagesPatient.find(page => page.title === "Afiliación");
+
+  if (result === "Approved") {
+    //alert("Afiliación cargada correctamente");
+    Affiliationtrue.value = true;
+    if (affiliationItem) {
+      affiliationItem.url = "/patient/affiliation/search";
+    }
+  } else if (result === "Pending") {
+    alert("Afiliación en proceso de aprobación");
+    Affiliationtrue.value = false;
+    if (affiliationItem) {
+      affiliationItem.url = "/patient/affiliation";
+    }
+  } else {
+     alert("No se encontraron afiliaciones activas para el usuario.");
+      Affiliationtrue.value = false;
+    if (affiliationItem) {
+      affiliationItem.url = "/patient/affiliation";
+    }
+  }
       bootstrap();
     });
 

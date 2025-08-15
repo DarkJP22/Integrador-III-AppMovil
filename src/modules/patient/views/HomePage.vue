@@ -70,11 +70,11 @@
               <ion-button :color="darkModeActive ? 'primary' : 'light'" expand="block" size="large" shape="round" router-link="/patient/search">
                 Buscar Profesional</ion-button>
             </ion-col>
-            <!-- <ion-col class="" size-md="12" size-lg="12" size-xs="12">
+           <ion-col class="" size-md="12" size-lg="12" size-xs="12">
               <ion-button :color="darkModeActive ? 'primary' : 'light'" expand="block" size="large" shape="round" router-link="/patient/search-labs">
                 <ion-icon :md="peopleSharp" :ios="peopleOutline" slot="start"></ion-icon> 
                 Laboratorio</ion-button>
-            </ion-col> -->
+            </ion-col>
           </ion-row>
           <ion-row class="ion-justify-content-center ion-align-items-center">
             <ion-col class="" size-md="12" size-lg="12" size-xs="12">
@@ -121,6 +121,7 @@ import {
   notificationsSharp,
   notificationsOutline,
   peopleOutline,
+  peopleSharp,
 } from "ionicons/icons";
 import useAuth from "@/modules/auth/composables/useAuth";
 import { computed, watch, onMounted, ref } from "vue";

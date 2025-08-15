@@ -75,3 +75,4 @@ window.addEventListener('load', ()=>{
 async function deviceReadyInit(){
   await SplashScreen.hide()
 }
+//Hola este es un comentario de prueba

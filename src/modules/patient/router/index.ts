@@ -229,6 +229,37 @@ export default [
         beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
         component: () => import('@/modules/patient/views/LabPage.vue'),
         meta: { requiresAuth: false }
+    },
+    //This route is for the affiliate patient
+    {
+        path: '/patient/affiliation',
+        name: 'affiliation',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/AffiliationPage.vue'),
+        meta: { requiresAuth: false }
+    },
+    {
+        path: '/patient/affiliation/terms',
+        name: 'affiliation-terms',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/AffiliationTermsConditions.vue'),
+        meta: { requiresAuth: false }
+    },
+    {
+        path: '/patient/affiliation/search',
+        name: 'affiliation-search',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/AffiliationSearchPage.vue'),
+        meta: { requiresAuth: false }
+    },
+    
+    {
+        path: '/patient/affiliation/register',
+        name: 'affiliation-register',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/AffiliationRegister.Page.vue'),
+        meta: { requiresAuth: false }
+    }
     },{
         path: '/patient/branches',
         name: 'branches',

@@ -67,12 +67,37 @@ const useUi = () => {
             isLoading = false;
             return await loadingController.dismiss().then( () => console.log('dismissed') )
         }
-  
+   //Se AGREGA ESTA FUNCION PARA EL CONFIRM grupo g1     
+  const confirmDialog = async (header: string, message: string): Promise<boolean> => {
+  return new Promise(async (resolve) => {
+    const buttons = [
+      {
+        text: 'Cancelar',
+        role: 'cancel',
+        handler: () => resolve(false)
+      },
+      {
+        text: 'Sí',
+        role: 'confirm',
+        handler: () => resolve(true)
+      }
+    ];
+
+    const alert = await alertController.create({
+      header,
+      message,
+      buttons
+    });
+
+    await alert.present();
+  });
+};
+//HASTA AQUI SE AGREGA ESTA FUNCION PARA EL CONFIRM grupo g1
   
       
   
       return {
-  
+        confirmDialog,  //Se EXPORTA ESTA FUNCION PARA EL CONFIRM grupo g1
           // functions
           toastMessage,
           alertMessage,
