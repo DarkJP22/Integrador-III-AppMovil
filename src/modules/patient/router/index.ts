@@ -259,8 +259,8 @@ export default [
         beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
         component: () => import('@/modules/patient/views/AffiliationRegister.Page.vue'),
         meta: { requiresAuth: false }
-    }
-    },{
+    },
+    {
         path: '/patient/branches',
         name: 'branches',
         beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],

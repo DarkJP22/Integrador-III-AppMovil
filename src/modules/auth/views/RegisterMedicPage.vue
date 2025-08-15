@@ -414,7 +414,7 @@ const plans = computed(() => auth.value.global?.plans.filter((p: any) => p.for_m
 const filteredSpecialities = computed(() => {
   return specialities.value.filter((s) => s.professional === form.value.type_of_health_professional);
 });
-
+ 
 function removeTempPhoto(photo: any, index: any) {
   photos.value.splice(index, 1);
 }
