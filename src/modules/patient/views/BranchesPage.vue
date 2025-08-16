@@ -227,7 +227,7 @@ export default defineComponent({
 .loading-text {
   margin-top: 16px;
   font-size: 16px;
-  color: #666;
+  color: white;
   text-align: center;
 }
 

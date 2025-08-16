@@ -241,6 +241,12 @@ export default [
         beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
         component: () => import('@/modules/patient/views/DrugsPage.vue'),
         meta: { requiresAuth: false }
+    },{
+        path: '/patient/orders/:userId',
+        name: 'patient-orders',
+        beforeEnter: [ isAuthenticatedGuard, isPatientGuard ],
+        component: () => import('@/modules/patient/views/OrdersPage.vue'),
+        meta: { requiresAuth: false }
     }
    
 
