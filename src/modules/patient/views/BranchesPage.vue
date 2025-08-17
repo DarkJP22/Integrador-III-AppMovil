@@ -58,6 +58,7 @@
 </template>
 
 <script lang="ts">
+// filepath: c:\Users\UTN\Documents\Repositorio-Integrador-Mobil\Integrador-III-AppMovil\src\modules\patient\views\BranchesPage.vue
 import {
   IonPage,
   IonHeader,
@@ -122,7 +123,6 @@ export default defineComponent({
 
     const getUserLocation = async () => {
       try {
-        console.log('Obteniendo ubicación...');
         loadingMessage.value = 'Obteniendo ubicación...';
         console.log('Api', URL)
 
@@ -139,12 +139,8 @@ export default defineComponent({
           lon: position.coords.longitude
         };
 
-        console.log('Ubicación obtenida:', userLocation.value);
-
       } catch (error) {
-        console.error('Error ubicación:', error);
         userLocation.value = { lat: 9.9281, lon: -84.0907 };
-        console.log('Usando ubicación por defecto');
       }
     };
 
@@ -179,16 +175,14 @@ export default defineComponent({
           }
         });
 
-        console.log(`Farmacias encontradas: ${nearbyPharmacies.value.length}`);
       } catch (error) {
-        console.error('Error:', error);
+        // Error silencioso
       } finally {
         isLoading.value = false;
       }
     };
 
     const goToPharmacyDrugs = (pharmacyId: number) => {
-      console.log('Navegando a farmacia con ID:', pharmacyId);
       router.push(`/patient/drugs/${pharmacyId}`);
     };
 

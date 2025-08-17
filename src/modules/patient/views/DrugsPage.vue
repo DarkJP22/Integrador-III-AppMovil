@@ -205,10 +205,10 @@
       </ion-content>
     </ion-modal>
 
-    <!-- ALERTA DE ÉXITO -->
+    <!-- ✅ ALERTA DE ÉXITO CON ESTILOS ACTUALIZADOS -->
     <ion-alert
       :is-open="showSuccessAlert"
-      css-class="my-custom-class"
+      css-class="success-alert-class"
       header="Orden Enviada"
       message="Tu orden ha sido enviada exitosamente."
       :buttons="[{ text: 'Aceptar', handler: closeSuccessAlert }]"
@@ -218,6 +218,7 @@
 </template>
 
 <script lang="ts">
+// filepath: c:\Users\UTN\Documents\Repositorio-Integrador-Mobil\Integrador-III-AppMovil\src\modules\patient\views\DrugsPage.vue
 import { 
   IonPage, IonHeader, IonToolbar, IonButtons, IonTitle, IonContent,
   IonBackButton, IonCard, IonCardContent, IonButton, IonSearchbar,
@@ -259,7 +260,7 @@ export default defineComponent({
     // CONFIGURACIÓN
     const { auth } = useAuth();
     const route = useRoute();
-    const router = useRouter(); // ← AGREGAR router
+    const router = useRouter();
     const userId = auth.value.user.id;
     const pharmacyId = route.params.pharmacyId;
 
@@ -324,7 +325,7 @@ export default defineComponent({
         });
         
       } catch (error) {
-        console.error('Error al cargar medicamentos:', error);
+        // Error silencioso
       }
     };
 
@@ -356,7 +357,6 @@ export default defineComponent({
         };
 
       } catch (error) {
-        console.error('Error al crear la orden:', error);
         return null;
       }
     };
@@ -365,14 +365,11 @@ export default defineComponent({
       const order = createOrder();
       
       if (!order) {
-        console.log('No hay medicamentos seleccionados');
         return;
       }
 
       orderToReview.value = order;
       isModalOpen.value = true;
-      console.log('=== MOSTRANDO ORDEN EN MODAL ===');
-      console.log(order);
     };
 
     const closeModal = () => {
@@ -387,7 +384,7 @@ export default defineComponent({
         console.log('=== ENVIANDO ORDEN A LA API ===');
         console.log('Datos a enviar:', orderToReview.value);
 
-        const response = await fetch(URL + '/orders', {
+        const response = await fetch('http://127.0.0.1:8000/api/orders', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -396,11 +393,8 @@ export default defineComponent({
           body: JSON.stringify(orderToReview.value)
         });
 
-        console.log('Respuesta HTTP:', response.status, response.statusText);
-
         if (response.ok) {
           const result = await response.json();
-          console.log('✅ ÉXITO - Respuesta de la API:', result);
           
           // Guardar resultado
           orderResult.value = result;
@@ -415,12 +409,11 @@ export default defineComponent({
           showSuccessAlert.value = true;
           
         } else {
-          const errorData = await response.text();
-          console.error('❌ ERROR HTTP:', response.status, errorData);
+          // Error silencioso
         }
 
       } catch (error) {
-        console.error('❌ ERROR DE RED:', error);
+        // Error silencioso
       }
     };
 
@@ -435,15 +428,12 @@ export default defineComponent({
       orderResult.value = null;
     };
 
-    // NUEVA FUNCIÓN PARA NAVEGAR
     const goToOrders = () => {
-      router.push(`/patient/orders/${userId}`); // ← Cambia la ruta según tu configuración
+      router.push(`/patient/orders/${userId}`);
     };
 
     // INICIALIZACIÓN
     onMounted(() => {
-      console.log('Pharmacy ID:', pharmacyId);
-      console.log('User ID:', userId);
       loadDrugs();
     });
 
@@ -476,7 +466,7 @@ export default defineComponent({
       goToOrders,
       
       // Iconos
-      receiptSharp // ← CAMBIAR A receiptSharp
+      receiptSharp
     };
   }
 });
@@ -782,27 +772,27 @@ export default defineComponent({
   background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
 }
 
-.my-custom-class {
+/* ✅ ESTILOS ACTUALIZADOS PARA EL ALERT - IGUAL QUE ORDERSPAGE */
+:deep(.success-alert-class) {
   --background: #ffffff;
   --border-radius: 12px;
   --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
-.my-custom-class .alert-title {
+:deep(.success-alert-class .alert-title) {
   font-size: 18px;
   font-weight: bold;
-  color: #333;
-  margin: 0;
+  color: #28a745 !important;
 }
 
-.my-custom-class .alert-message {
+:deep(.success-alert-class .alert-message) {
   font-size: 16px;
-  color: #666;
+  color: #666 !important;
   margin: 8px 0;
 }
 
-.my-custom-class .alert-button {
+:deep(.success-alert-class .alert-button) {
   font-weight: 600;
-  color: #007bff;
+  color: #28a745 !important;
 }
 </style>
