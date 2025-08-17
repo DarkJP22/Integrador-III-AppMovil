@@ -79,7 +79,7 @@ import { Geolocation } from '@capacitor/geolocation';
 import { useRouter } from 'vue-router';
 
 import useAuth from '../../auth/composables/useAuth';
-
+const URL = import.meta.env.VITE_API_URL;
 export default defineComponent({
   name: 'BranchesPage',
   components: {
@@ -124,6 +124,7 @@ export default defineComponent({
       try {
         console.log('Obteniendo ubicación...');
         loadingMessage.value = 'Obteniendo ubicación...';
+        console.log('Api', URL)
 
         const options = {
           enableHighAccuracy: false,
@@ -151,7 +152,7 @@ export default defineComponent({
       try {
         loadingMessage.value = 'Buscando farmacias cercanas...';
 
-        const response = await fetch('http://127.0.0.1:8000/api/pharmacies', {
+        const response = await fetch( URL + '/pharmacies', {
           headers: { 'Accept': 'application/json' }
         });
 

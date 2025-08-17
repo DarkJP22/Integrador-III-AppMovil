@@ -156,7 +156,9 @@ import {
 
 // IMPORTAR COMPOSABLES
 import { useMyBroadcastEvents } from '@/composables/useMyBroadcastEvents';
-import useAuth from '../../auth/composables/useAuth';
+import usePushNotifications from '@/composables/usePushNotifications';
+
+const URL = import.meta.env.VITE_API_URL;
 
 // INTERFACES (mantener iguales)
 interface Pharmacy {
@@ -240,15 +242,15 @@ export default defineComponent({
     const userId = route.params.userId as string;
 
     // USAR LOS COMPOSABLES
-    const { auth } = useAuth();
     const { currentChannel } = useMyBroadcastEvents();
+    const { setOrderUpdateCallback } = usePushNotifications();
 
     // FUNCIONES PRINCIPALES
     const loadOrders = async (): Promise<void> => {
       try {
         loading.value = true;
         
-        const response = await fetch(`http://127.0.0.1:8000/api/users/${userId}/orders`, {
+        const response = await fetch( URL + `/users/${userId}/orders`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -269,6 +271,33 @@ export default defineComponent({
         orders.value = [];
       } finally {
         loading.value = false;
+      }
+    };
+
+    // ✅ FUNCIÓN PARA MANEJAR NOTIFICACIONES PUSH DE ÓRDENES
+    const handleOrderPushNotification = (notificationData: any) => {
+      console.log('🔔 [OrdersPage] Notificación push de orden recibida:', notificationData);
+      
+      // Si es una notificación simple (sin datos completos de la orden)
+      if (notificationData.isSimpleNotification) {
+        console.log('🔔 [OrdersPage] Notificación simple detectada, recargando lista completa...');
+        loadOrders();
+        return;
+      }
+      
+      // Si la notificación contiene datos completos de la orden, actualizar la lista
+      if (notificationData.order && notificationData.orderDetails) {
+        console.log('📦 [OrdersPage] Actualizando orden desde notificación push:', {
+          orderId: notificationData.order.id,
+          status: notificationData.order.status,
+          cantidadDetalles: notificationData.orderDetails.length
+        });
+        
+        updateOrderInList(notificationData.order, notificationData.orderDetails);
+      } else {
+        // Si no tiene los datos completos, recargar la lista
+        console.log('🔄 [OrdersPage] Datos incompletos en notificación, recargando lista...');
+        loadOrders();
       }
     };
 
@@ -398,6 +427,10 @@ export default defineComponent({
     onMounted(async () => {
       await loadOrders();
       
+      // ✅ Configurar callback para notificaciones push de órdenes
+      console.log('🔔 [OrdersPage] Configurando callback para notificaciones push');
+      setOrderUpdateCallback(handleOrderPushNotification);
+      
       setTimeout(() => {
         listenToPusherEvents();
       }, 1500);
@@ -406,6 +439,8 @@ export default defineComponent({
     // LIMPIEZA
     onUnmounted(() => {
       console.log('Limpiando listeners de OrdersPage');
+      // ✅ Limpiar callback de notificaciones push
+      setOrderUpdateCallback(() => {});
     });
 
     // RETURN
