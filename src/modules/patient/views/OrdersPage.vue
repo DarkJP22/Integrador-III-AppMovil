@@ -489,11 +489,6 @@ export default defineComponent({
     
     const userId = route.params.userId as string;
 
-<<<<<<< HEAD
-    // USAR LOS COMPOSABLES
-    const { currentChannel } = useMyBroadcastEvents();
-    const { setOrderUpdateCallback } = usePushNotifications();
-=======
     // ESTADO PRINCIPAL
     const orders = ref<Order[]>([]);
     const selectedOrder = ref<Order | null>(null);
@@ -518,7 +513,6 @@ export default defineComponent({
     const selectedFile = ref<File | null>(null);
     const voucherBase64 = ref<string>('');
     const fileInputRef = ref<HTMLInputElement | null>(null);
->>>>>>> d6ebf60be449ddca1e5925e37e743340d05a8081
 
     // COMPUTED
     const isFormValid = computed(() => {
@@ -598,86 +592,12 @@ export default defineComponent({
       }
     };
 
-<<<<<<< HEAD
-    // ✅ FUNCIÓN PARA MANEJAR NOTIFICACIONES PUSH DE ÓRDENES
-    const handleOrderPushNotification = (notificationData: any) => {
-      console.log('🔔 [OrdersPage] Notificación push de orden recibida:', notificationData);
-      
-      // Si es una notificación simple (sin datos completos de la orden)
-      if (notificationData.isSimpleNotification) {
-        console.log('🔔 [OrdersPage] Notificación simple detectada, recargando lista completa...');
-        loadOrders();
-        return;
-      }
-      
-      // Si la notificación contiene datos completos de la orden, actualizar la lista
-      if (notificationData.order && notificationData.orderDetails) {
-        console.log('📦 [OrdersPage] Actualizando orden desde notificación push:', {
-          orderId: notificationData.order.id,
-          status: notificationData.order.status,
-          cantidadDetalles: notificationData.orderDetails.length
-        });
-        
-        updateOrderInList(notificationData.order, notificationData.orderDetails);
-      } else {
-        // Si no tiene los datos completos, recargar la lista
-        console.log('🔄 [OrdersPage] Datos incompletos en notificación, recargando lista...');
-        loadOrders();
-      }
-    };
-
-    // ✅ FUNCIÓN PARA ACTUALIZAR UNA ORDEN ESPECÍFICA EN LA LISTA
-    const updateOrderInList = (updatedOrderData: any, orderDetailsData: any[]) => {
-      const orderIndex = orders.value.findIndex(order => order.id === updatedOrderData.id);
-      
-      if (orderIndex !== -1) {
-        // Actualizar datos generales de la orden
-        orders.value[orderIndex] = {
-          ...orders.value[orderIndex],
-          ...updatedOrderData,
-          // Campos críticos de la orden
-          status: updatedOrderData.status,
-          order_total: updatedOrderData.order_total,
-          shipping_total: updatedOrderData.shipping_total,
-          updated_at: updatedOrderData.updated_at,
-          // ✅ REEMPLAZAR los detalles con los que vienen del evento
-          details: orderDetailsData.map((detail: any) => ({
-            id: detail.id,
-            order_id: detail.order_id,
-            drug_id: detail.drug_id,
-            requested_amount: detail.requested_amount,
-            quantity_available: detail.quantity_available,
-            unit_price: detail.unit_price.toString(),
-            products_total: detail.products_total.toString(),
-            description: detail.description,
-            drug: detail.drug
-          }))
-        };
-        
-        console.log(`✅ Orden ${updatedOrderData.id} y sus ${orderDetailsData.length} detalles actualizados`);
-        
-        // Si el modal está abierto con esta orden, actualizarlo también
-        if (selectedOrder.value && selectedOrder.value.id === updatedOrderData.id) {
-          selectedOrder.value = {
-            ...selectedOrder.value,
-            ...updatedOrderData,
-            status: updatedOrderData.status,
-            order_total: updatedOrderData.order_total,
-            shipping_total: updatedOrderData.shipping_total,
-            updated_at: updatedOrderData.updated_at,
-            // ✅ Actualizar también los detalles en el modal
-            details: orders.value[orderIndex].details
-          };
-          
-          console.log(`✅ Modal también actualizado para orden ${updatedOrderData.id}`);
-=======
     const updateOrderStatus = async (orderId: number, status: string, additionalData: Record<string, any> = {}): Promise<boolean> => {
       try {
         const token = auth.value.access_token;
         if (!token) {
           alert(ERROR_MESSAGES[401]);
           return false;
->>>>>>> d6ebf60be449ddca1e5925e37e743340d05a8081
         }
 
         const response = await fetch(`${URL}/orders/${orderId}`, {
@@ -691,7 +611,7 @@ export default defineComponent({
         });
 
         if (response.ok) return true;
-        
+
         const errorData = await response.json().catch(() => ({}));
         handleApiError(response.status, errorData);
         return false;
@@ -877,15 +797,6 @@ export default defineComponent({
     const updateOrderInList = (newOrderData: any, newDetailsData: any[]): void => {
       const orderIndex = orders.value.findIndex(order => order.id === newOrderData.id);
       
-<<<<<<< HEAD
-      // ✅ Configurar callback para notificaciones push de órdenes
-      console.log('🔔 [OrdersPage] Configurando callback para notificaciones push');
-      setOrderUpdateCallback(handleOrderPushNotification);
-      
-      setTimeout(() => {
-        listenToPusherEvents();
-      }, 1500);
-=======
       if (orderIndex !== -1) {
         orders.value[orderIndex] = {
           ...orders.value[orderIndex],
@@ -923,17 +834,10 @@ export default defineComponent({
       await checkAuthentication();
       await loadOrders();
       setTimeout(listenToPusherEvents, 1500);
->>>>>>> d6ebf60be449ddca1e5925e37e743340d05a8081
     });
 
     onUnmounted(() => {
-<<<<<<< HEAD
-      console.log('Limpiando listeners de OrdersPage');
-      // ✅ Limpiar callback de notificaciones push
-      setOrderUpdateCallback(() => {});
-=======
       // Cleanup listeners
->>>>>>> d6ebf60be449ddca1e5925e37e743340d05a8081
     });
 
     return {

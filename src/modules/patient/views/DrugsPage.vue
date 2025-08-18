@@ -218,7 +218,6 @@
 </template>
 
 <script lang="ts">
-// filepath: c:\Users\UTN\Documents\Repositorio-Integrador-Mobil\Integrador-III-AppMovil\src\modules\patient\views\DrugsPage.vue
 import { 
   IonPage, IonHeader, IonToolbar, IonButtons, IonTitle, IonContent,
   IonBackButton, IonCard, IonCardContent, IonButton, IonSearchbar,
@@ -228,8 +227,6 @@ import { receiptSharp } from 'ionicons/icons';
 import { defineComponent, onMounted, ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import useAuth from '../../auth/composables/useAuth';
-
-const URL = import.meta.env.VITE_API_URL;
 
 const URL = import.meta.env.VITE_API_URL;
 
