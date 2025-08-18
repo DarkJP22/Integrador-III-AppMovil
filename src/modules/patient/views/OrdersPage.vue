@@ -397,6 +397,8 @@ import {
 import { useMyBroadcastEvents } from '@/composables/useMyBroadcastEvents';
 import useAuth from '../../auth/composables/useAuth';
 
+const URL = import.meta.env.VITE_API_URL;
+
 // INTERFACES
 interface Pharmacy {
   id: number;
@@ -568,8 +570,8 @@ export default defineComponent({
     const loadOrders = async (): Promise<void> => {
       try {
         loading.value = true;
-        
-        const response = await fetch(`http://127.0.0.1:8000/api/users/${userId}/orders`, {
+
+        const response = await fetch(`${URL}/users/${userId}/orders`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -598,7 +600,7 @@ export default defineComponent({
           return false;
         }
 
-        const response = await fetch(`http://127.0.0.1:8000/api/orders/${orderId}`, {
+        const response = await fetch(`${URL}/orders/${orderId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

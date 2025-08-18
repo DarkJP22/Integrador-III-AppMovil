@@ -229,6 +229,8 @@ import { defineComponent, onMounted, ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import useAuth from '../../auth/composables/useAuth';
 
+const URL = import.meta.env.VITE_API_URL;
+
 // INTERFAZ
 interface Drug {
   id: number;
@@ -312,7 +314,7 @@ export default defineComponent({
     // FUNCIONES PRINCIPALES
     const loadDrugs = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/drugs');
+        const response = await fetch(`${URL}/drugs`);
         const data = await response.json();
         
         drugs.value = data.data;
@@ -379,7 +381,7 @@ export default defineComponent({
       if (!orderToReview.value) return;
 
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/orders', {
+        const response = await fetch(`${URL}/orders`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
