@@ -126,6 +126,7 @@ export default defineComponent({
     const getUserLocation = async () => {
       try {
         loadingMessage.value = 'Obteniendo ubicación...';
+        console.log('Api', URL)
 
         const options = {
           enableHighAccuracy: false,

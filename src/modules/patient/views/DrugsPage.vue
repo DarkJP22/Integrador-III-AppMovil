@@ -231,6 +231,8 @@ import useAuth from '../../auth/composables/useAuth';
 
 const URL = import.meta.env.VITE_API_URL;
 
+const URL = import.meta.env.VITE_API_URL;
+
 // INTERFAZ
 interface Drug {
   id: number;
