@@ -162,12 +162,6 @@ export default defineComponent({
         url: "/patient/account",
         iosIcon: personCircleOutline,
         mdIcon: personCircleSharp,
-      },
-      {
-        title: "Farmacias",
-        url: "/patient/branches",
-        iosIcon: cartOutline,
-        mdIcon: cartSharp,
       }
     ];
 

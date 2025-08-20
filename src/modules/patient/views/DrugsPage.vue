@@ -117,7 +117,7 @@
       </ion-toolbar>
     </ion-footer>
 
-    <!-- MODAL DE REVISIÓN -->
+    <!-- MODAL DE REVISIÓN CON ESTILOS DE ORDERSPAGE -->
     <ion-modal :is-open="isModalOpen" @will-dismiss="closeModal">
       <ion-header>
         <ion-toolbar color="primary">
@@ -130,77 +130,74 @@
         </ion-toolbar>
       </ion-header>
       
-      <ion-content class="modal-content">
-        <div class="ion-padding">
-          <div v-if="orderToReview">
+      <ion-content>
+        <div class="ion-padding" v-if="orderToReview">
+          
+          <h1 class="page-title">Revisar tu Orden</h1>
+
+          <!-- MEDICAMENTOS SELECCIONADOS -->
+          <ion-card class="order-detail-card">
+            <ion-card-content>
+              <h3>Medicamentos Seleccionados</h3>
+              
+              <div v-for="(detail, index) in orderToReview.details" :key="index" class="medication-item">
+                <div class="medication-header">
+                  <h4>{{ detail.description.split(' - ')[0] }}</h4>
+                  <div class="quantity-badge">
+                    {{ detail.requested_amount }}
+                  </div>
+                </div>
+                
+                <p class="medication-description">{{ detail.description.split(' - ')[1] }}</p>
+                <div class="medication-info">
+                  <p><strong>Cantidad solicitada:</strong> {{ detail.requested_amount }} unidades</p>
+                </div>
+                
+                <hr v-if="index < orderToReview.details.length - 1">
+              </div>
+              
+            </ion-card-content>
+          </ion-card>
+
+          <!-- RESUMEN -->
+          <ion-card class="order-detail-card">
+            <ion-card-content>
+              <h3>Resumen de la Orden</h3>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <span class="label">Total de medicamentos:</span>
+                  <span>{{ orderToReview.details.length }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Total de unidades:</span>
+                  <span class="total-amount">{{ totalUnits }} unidades</span>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- BOTONES CON MISMO ESTILO QUE ORDERSPAGE -->
+          <div class="confirmation-buttons">
+            <ion-button 
+              expand="block" 
+              color="primary" 
+              class="confirm-button"
+              @click="submitOrder"
+            >
+              Confirmar y Enviar Orden
+            </ion-button>
             
-            <h1 class="page-title">Revisar tu Orden</h1>
-
-            <!-- MEDICAMENTOS SELECCIONADOS -->
-            <ion-card class="drugs-card">
-              <ion-card-content>
-                <h2 class="section-title">Medicamentos Seleccionados</h2>
-                
-                <div v-for="(detail, index) in orderToReview.details" :key="index" class="medicamento-modal-item">
-                  <div class="drug-header">
-                    <h3 class="drug-name">{{ detail.description.split(' - ')[0] }}</h3>
-                    <div class="quantity-badge">
-                      {{ detail.requested_amount }}
-                    </div>
-                  </div>
-                  
-                  <p class="drug-presentation">{{ detail.description.split(' - ')[1] }}</p>
-                  <p class="drug-quantity-text">
-                    <strong>Cantidad solicitada:</strong> {{ detail.requested_amount }} unidades
-                  </p>
-                  
-                  <div v-if="index < orderToReview.details.length - 1" class="separator"></div>
-                </div>
-                
-              </ion-card-content>
-            </ion-card>
-
-            <!-- RESUMEN -->
-            <ion-card class="summary-card">
-              <ion-card-content>
-                <div class="resumen">
-                  <h2 class="section-title">Resumen de la Orden</h2>
-                  <div class="summary-grid">
-                    <div class="summary-item">
-                      <span class="summary-label">Total de medicamentos:</span>
-                      <span class="summary-value">{{ orderToReview.details.length }}</span>
-                    </div>
-                    <div class="summary-item">
-                      <span class="summary-label">Total de unidades:</span>
-                      <span class="summary-value-main">{{ totalUnits }} unidades</span>
-                    </div>
-                  </div>
-                </div>
-              </ion-card-content>
-            </ion-card>
-
-            <!-- BOTONES -->
-            <div class="modal-buttons">
-              <ion-button 
-                expand="block" 
-                fill="outline" 
-                color="medium" 
-                @click="closeModal"
-                class="cancel-btn"
-              >
-                Cancelar
-              </ion-button>
-              <ion-button 
-                expand="block" 
-                color="primary" 
-                @click="submitOrder"
-                class="confirm-btn"
-              >
-                Confirmar y Enviar Orden
-              </ion-button>
-            </div>
-
+            <ion-button 
+              expand="block" 
+              fill="outline" 
+              color="medium" 
+              @click="closeModal"
+              class="cancel-button"
+            >
+              Cancelar
+            </ion-button>
           </div>
+
         </div>
       </ion-content>
     </ion-modal>
@@ -482,7 +479,7 @@ export default defineComponent({
   text-align: center;
   font-size: 20px;
   font-weight: bold;
-  color: #ffffff;
+  color: #333;
   margin: 16px 0;
 }
 
@@ -509,8 +506,8 @@ export default defineComponent({
 .drug-name {
   font-size: 18px;
   font-weight: bold;
-  color: #333;
   margin: 0;
+  color: #333;
 }
 
 .quantity-badge {
@@ -595,99 +592,41 @@ export default defineComponent({
   font-size: 16px;
 }
 
-.modal-content {
-  --background: linear-gradient(135deg, #cdd1e6 0%, #8bb6ee 100%);
-}
-
-.info-card, .drugs-card, .summary-card {
-  background: #ffffff;
-  border-radius: 12px;
+.order-detail-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  color: #333;
   margin: 12px 0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
 }
 
-.section-title {
+.order-detail-card h3 {
   font-size: 18px;
   font-weight: bold;
   color: #333;
   margin: 0 0 16px 0;
-  text-align: center;
+  text-align: left;
 }
 
-.info-section {
-  text-align: center;
-}
-
-.info-grid {
-  display: grid;
-  gap: 12px;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.info-item:last-child {
-  border-bottom: none;
-}
-
-.info-label {
-  font-weight: 500;
-  color: #666;
-  font-size: 14px;
-}
-
-.info-value {
-  color: #333;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.info-value-highlight {
-  background: #28a745;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.medicamento-modal-item {
+.medication-item {
   margin-bottom: 16px;
 }
 
-.medicamento-modal-item .drug-header {
+.medication-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
 
-.medicamento-modal-item .drug-name {
+.medication-header h4 {
   font-size: 16px;
   font-weight: bold;
-  color: #333;
   margin: 0;
+  color: #333;
 }
 
-.medicamento-modal-item .quantity-badge {
-  background: #28a745;
-  color: white;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.medicamento-modal-item .drug-presentation {
+.medication-description {
   background: #f0f0f0;
   color: #666;
   padding: 4px 8px;
@@ -697,77 +636,70 @@ export default defineComponent({
   display: inline-block;
 }
 
-.drug-quantity-text {
-  color: #666;
+.medication-info p {
   font-size: 14px;
-  margin: 8px 0 0 0;
+  margin: 4px 0;
+  color: #333;
 }
 
-.separator {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #ddd, transparent);
-  margin: 16px 0;
-}
-
-.resumen {
-  text-align: center;
-}
-
-.summary-grid {
+.detail-grid {
   display: grid;
   gap: 12px;
+  margin-top: 16px;
 }
 
-.summary-item {
+.detail-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.summary-label {
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.label {
   font-weight: 500;
-  color: #666;
   font-size: 14px;
-}
-
-.summary-value {
   color: #333;
-  font-weight: 600;
-  font-size: 14px;
 }
 
-.summary-value-main {
-  background: #007bff;
-  color: white;
-  padding: 6px 16px;
-  border-radius: 20px;
+.total-amount {
   font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
+  color: #333;
 }
 
-.modal-buttons {
+.confirmation-buttons {
   margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 0 4px;
+  padding: 16px 0;
 }
 
-.cancel-btn {
-  --border-radius: 12px;
+.confirm-button {
+  margin-bottom: 12px;
   height: 48px;
   font-weight: 600;
 }
 
-.confirm-btn {
-  --border-radius: 12px;
+.cancel-button {
+  margin-bottom: 0;
   height: 48px;
   font-weight: 600;
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
 }
 
-/* ✅ ESTILOS ACTUALIZADOS PARA EL ALERT - IGUAL QUE ORDERSPAGE */
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 16px 0;
+}
+
+.modal-content {
+  --background: #f8f9fa;
+}
+
+/* ESTILOS PARA EL ALERT */
 :deep(.success-alert-class) {
   --background: #ffffff;
   --border-radius: 12px;
