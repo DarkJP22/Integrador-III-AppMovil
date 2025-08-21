@@ -62,7 +62,12 @@
               <p><strong>Farmacia:</strong> {{ order.pharmacy.name }}</p>
               <p><strong>Fecha:</strong> {{ formatDate(order.date) }}</p>
               <p><strong>Medicamentos:</strong> {{ order.details.length }} items</p>
-              <p><strong>Total:</strong> ₡{{ order.order_total }}</p>
+              <p v-if="order.requires_shipping" class="shipping-row">
+                <strong>Total:</strong> ₡{{ order.shipping_total }}
+              </p>
+              <p v-else class="shipping-row">
+                <strong>Total:</strong> ₡{{ order.order_total }}
+              </p>
             </div>
             
             <!-- BOTÓN PARA ABRIR DETALLES -->
@@ -121,8 +126,10 @@
                 </div>
                 <div class="detail-item">
                   <span class="label">Total:</span>
-                  <span class="total-amount">₡{{ selectedOrder.order_total }}</span>
+                  <span v-if="selectedOrder.requires_shipping" class="total-amount">₡{{selectedOrder.shipping_total }}</span>
+                  <span v-else class="total-amount">₡{{ selectedOrder.order_total }}</span>
                 </div>
+
               </div>
             </ion-card-content>
           </ion-card>
@@ -181,7 +188,7 @@
       </ion-content>
     </ion-modal>
 
-    <!-- ✅ NUEVO MODAL DE CONFIRMACIÓN DE ORDEN -->
+    <!-- ✅ MODAL DE CONFIRMACIÓN DE ORDEN SIN SECCIÓN DE ENVÍO -->
     <ion-modal :is-open="showConfirmationModal" @will-dismiss="closeConfirmationModal">
       <ion-header>
         <ion-toolbar color="primary">
@@ -256,77 +263,16 @@
             </ion-card-content>
           </ion-card>
           
-          <!-- SECCIÓN ENVÍO -->
-          <ion-card class="form-card">
-            <ion-card-content>
-              <h2 class="section-title">Opciones de Entrega</h2>
-              
-              <ion-item>
-                <ion-label>¿Requiere envío a domicilio?</ion-label>
-                <ion-checkbox v-model="requiresShipping"></ion-checkbox>
-              </ion-item>
-              
-              <!-- DIRECCIÓN SI REQUIERE ENVÍO -->
-              <div v-if="requiresShipping" class="shipping-section">
-                <ion-item>
-                  <ion-label position="stacked">Dirección de Entrega</ion-label>
-                  <ion-textarea 
-                    v-model="deliveryAddress"
-                    placeholder="Ingresa tu dirección completa"
-                    :rows="3"
-                  ></ion-textarea>
-                </ion-item>
-                
-                <ion-item>
-                  <ion-label>Coordenadas GPS</ion-label>
-                  <ion-button 
-                    fill="outline" 
-                    size="small" 
-                    class="coordinates-button"
-                    @click="getCurrentLocation"
-                    :disabled="gettingLocation"
-                  >
-                    <ion-spinner v-if="gettingLocation" slot="start" name="crescent"></ion-spinner>
-                    <ion-icon v-else name="location" slot="start"></ion-icon>
-                    {{ gettingLocation ? 'Obteniendo...' : 'Obtener Coordenadas' }}
-                  </ion-button>
-                </ion-item>
-                
-                <div class="coordinates-display" v-if="coordinates">
-                  <ion-card class="coordinates-card">
-                    <ion-card-content>
-                      <div class="coordinates-info">
-                        <ion-icon name="location-sharp" color="primary"></ion-icon>
-                        <div>
-                          <p><strong>Latitud:</strong> {{ coordinates.lat }}</p>
-                          <p><strong>Longitud:</strong> {{ coordinates.lng }}</p>
-                        </div>
-                      </div>
-                    </ion-card-content>
-                  </ion-card>
-                </div>
-              </div>
-              
-            </ion-card-content>
-          </ion-card>
-          
           <!-- RESUMEN DE LA ORDEN -->
           <ion-card class="form-card" v-if="selectedOrder">
             <ion-card-content>
               <h2 class="section-title">Resumen de la Orden</h2>
               
               <div class="order-summary">
-                <div class="summary-row">
-                  <span>Subtotal:</span>
-                  <span>₡{{ selectedOrder.order_total }}</span>
-                </div>
-                <div class="summary-row" v-if="requiresShipping">
-                  <span>Envío:</span>
-                  <span>₡{{ selectedOrder.shipping_total || '0' }}</span>
-                </div>
                 <div class="summary-row total-row">
                   <span><strong>Total:</strong></span>
-                  <span><strong>₡{{ calculateTotal() }}</strong></span>
+                  <span v-if="selectedOrder.requires_shipping">₡{{selectedOrder.shipping_total }}</span>
+                  <span v-else>₡{{ selectedOrder.order_total }}</span>
                 </div>
               </div>
               
@@ -391,7 +337,7 @@ import {
   IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
   IonContent, IonCard, IonCardContent, IonButton, IonChip, IonModal,
   IonSpinner, IonAlert, IonItem, IonLabel, IonRadioGroup, IonRadio,
-  IonCheckbox, IonTextarea, IonIcon
+  IonIcon
 } from '@ionic/vue';
 
 import { useMyBroadcastEvents } from '@/composables/useMyBroadcastEvents';
@@ -476,7 +422,7 @@ export default defineComponent({
     IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
     IonContent, IonCard, IonCardContent, IonButton, IonChip, IonModal,
     IonSpinner, IonAlert, IonItem, IonLabel, IonRadioGroup, IonRadio,
-    IonCheckbox, IonTextarea, IonIcon
+    IonIcon
   },
   
   setup() {
@@ -501,21 +447,17 @@ export default defineComponent({
     // ESTADO DE ACCIONES
     const cancelingOrder = ref(false);
     const confirmingOrder = ref(false);
-    const gettingLocation = ref(false);
     
-    // ESTADO DEL FORMULARIO
+    // ESTADO DEL FORMULARIO (SIMPLIFICADO)
     const paymentMethod = ref('efectivo');
-    const requiresShipping = ref(false);
-    const deliveryAddress = ref('');
-    const coordinates = ref<{ lat: number; lng: number } | null>(null);
     const selectedFile = ref<File | null>(null);
     const voucherBase64 = ref<string>('');
     const fileInputRef = ref<HTMLInputElement | null>(null);
 
-    // COMPUTED
+    // COMPUTED SIMPLIFICADO
     const isFormValid = computed(() => {
+      // Solo validar si SINPE requiere archivo
       if (paymentMethod.value === 'sinpe' && !selectedFile.value) return false;
-      if (requiresShipping.value && (!deliveryAddress.value.trim() || !coordinates.value)) return false;
       return true;
     });
 
@@ -544,13 +486,6 @@ export default defineComponent({
       } catch {
         return dateString;
       }
-    };
-
-    const calculateTotal = (): string => {
-      if (!selectedOrder.value) return '0';
-      const subtotal = parseFloat(selectedOrder.value.order_total);
-      const shipping = requiresShipping.value ? parseFloat(selectedOrder.value.shipping_total || '0') : 0;
-      return (subtotal + shipping).toString();
     };
 
     const handleApiError = (status: number, errorData: any): void => {
@@ -619,7 +554,7 @@ export default defineComponent({
       }
     };
 
-    // FUNCIONES DE ACCIÓN
+    // FUNCIONES DE ACCIÓN SIMPLIFICADAS
     const confirmOrder = async (event?: Event): Promise<void> => {
       event?.preventDefault();
       event?.stopPropagation();
@@ -632,20 +567,11 @@ export default defineComponent({
       confirmingOrder.value = true;
 
       const orderData: Record<string, any> = {
-        payment_method: paymentMethod.value === 'sinpe' ? 1 : 0,
-        requires_shipping: requiresShipping.value ? 1 : 0
+        payment_method: paymentMethod.value === 'sinpe' ? 1 : 0
       };
 
       if (paymentMethod.value === 'sinpe' && voucherBase64.value) {
         orderData.voucher = voucherBase64.value;
-      }
-
-      if (requiresShipping.value) {
-        orderData.address = deliveryAddress.value.trim();
-        if (coordinates.value) {
-          orderData.lat = coordinates.value.lat;
-          orderData.lot = coordinates.value.lng;
-        }
       }
 
       const success = await updateOrderStatus(selectedOrder.value.id, 'confirmado', orderData);
@@ -721,31 +647,6 @@ export default defineComponent({
       }
     };
 
-    // FUNCIONES DE GEOLOCALIZACIÓN
-    const getCurrentLocation = (): void => {
-      if (!navigator.geolocation) {
-        alert('La geolocalización no está soportada');
-        return;
-      }
-
-      gettingLocation.value = true;
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          coordinates.value = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          gettingLocation.value = false;
-        },
-        () => {
-          gettingLocation.value = false;
-          alert('Error obteniendo ubicación');
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-      );
-    };
-
     // FUNCIONES DE MODAL
     const viewOrderDetails = (order: Order): void => {
       selectedOrder.value = order;
@@ -773,11 +674,9 @@ export default defineComponent({
       selectedOrder.value = null;
     };
 
+    // FUNCIÓN DE RESET SIMPLIFICADA
     const resetConfirmationForm = (): void => {
       paymentMethod.value = 'efectivo';
-      requiresShipping.value = false;
-      deliveryAddress.value = '';
-      coordinates.value = null;
       selectedFile.value = null;
       voucherBase64.value = '';
     };
@@ -848,12 +747,8 @@ export default defineComponent({
       showSuccessMessage,
       showConfirmationModal,
       paymentMethod,
-      requiresShipping,
-      deliveryAddress,
-      coordinates,
       selectedFile,
       confirmingOrder,
-      gettingLocation,
       showConfirmationSuccessAlert,
       fileInputRef,
       
@@ -865,7 +760,6 @@ export default defineComponent({
       getStatusColor,
       canPerformOrderActions,
       formatDate,
-      calculateTotal,
       viewOrderDetails,
       closeModal,
       loadOrders,
@@ -876,7 +770,6 @@ export default defineComponent({
       triggerFileInput,
       handleFileSelect,
       removeFile,
-      getCurrentLocation,
       confirmOrder,
       closeConfirmationSuccessAlert
     };
@@ -1094,39 +987,101 @@ ion-chip {
 }
 
 /* ✅ ESTILOS PARA EL MODAL DE CONFIRMACIÓN */
+
+/* Card del formulario */
 .form-card {
   margin: 16px 0;
-  background: white;
+  background: #ffffff !important;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef !important;
 }
 
+.form-card ion-card-content {
+  --background: #ffffff !important;
+  --color: #333333 !important;
+}
+
+/* Título de sección */
 .section-title {
   font-size: 18px;
   font-weight: bold;
-  color: #333;
+  color: #333333 !important;
   margin: 0 0 16px 0;
   text-align: center;
 }
 
+/* ✅ RADIO BUTTONS */
+.form-card ion-radio-group {
+  --background: #ffffff !important;
+}
+
+.form-card ion-item {
+  --background: #ffffff !important;
+  --color: #333333 !important;
+  --border-color: #e9ecef !important;
+  --inner-border-width: 0 0 1px 0;
+  --inner-padding: 16px;
+}
+
+.form-card ion-label {
+  --color: #333333 !important;
+  font-weight: 500;
+}
+
+.form-card ion-radio {
+  --color: #007bff !important;
+  --color-checked: #007bff !important;
+  --border-radius: 50%;
+  margin-right: 16px;
+}
+
+/* ✅ SECCIÓN DE VOUCHER */
 .voucher-section {
   margin-top: 16px;
   padding: 12px;
-  background: #f8f9fa;
+  background: #f8f9fa !important;
   border-radius: 8px;
+  border: 1px solid #e9ecef !important;
 }
 
+.voucher-section ion-item {
+  --background: #ffffff !important;
+  --color: #333333 !important;
+  --border-color: #e9ecef !important;
+}
+
+.voucher-section ion-label {
+  --color: #333333 !important;
+}
+
+/* ✅ BOTÓN DE SUBIR ARCHIVO */
 .upload-button {
   margin-top: 8px;
+  --background: #ffffff !important;
+  --color: #007bff !important;
+  --border-color: #007bff !important;
+  --border-style: solid;
+  --border-width: 1px;
 }
 
+.upload-button ion-icon {
+  color: #007bff !important;
+}
+
+/* ✅ PREVIEW DEL VOUCHER */
 .voucher-preview {
   margin-top: 12px;
 }
 
 .voucher-card {
-  background: #e3f2fd;
-  border: 1px solid #2196f3;
+  background: #e3f2fd !important;
+  border: 1px solid #2196f3 !important;
+}
+
+.voucher-card ion-card-content {
+  --background: #e3f2fd !important;
+  --color: #333333 !important;
 }
 
 .voucher-placeholder {
@@ -1137,44 +1092,21 @@ ion-chip {
   text-align: center;
 }
 
+.voucher-placeholder ion-icon {
+  color: #2196f3 !important;
+}
+
 .voucher-placeholder p {
   margin: 0;
   font-size: 14px;
-  color: #666;
+  color: #333333 !important;
 }
 
-.shipping-section {
-  margin-top: 16px;
-  padding: 12px;
-  background: #f0f8f0;
-  border-radius: 8px;
+.voucher-placeholder ion-button {
+  --color: #dc3545 !important;
 }
 
-.coordinates-button {
-  margin-top: 8px;
-}
-
-.coordinates-display {
-  margin-top: 12px;
-}
-
-.coordinates-card {
-  background: #fff3e0;
-  border: 1px solid #ff9800;
-}
-
-.coordinates-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.coordinates-info p {
-  margin: 4px 0;
-  font-size: 14px;
-  color: #333;
-}
-
+/* ✅ RESUMEN DE LA ORDEN */
 .order-summary {
   border-top: 1px solid #eee;
   padding-top: 16px;
@@ -1186,6 +1118,7 @@ ion-chip {
   align-items: center;
   padding: 8px 0;
   border-bottom: 1px solid #f0f0f0;
+  color: #333333 !important;
 }
 
 .summary-row:last-child {
@@ -1193,12 +1126,20 @@ ion-chip {
 }
 
 .total-row {
-  border-top: 2px solid #333;
+  border-top: 2px solid #28a745 !important;
+  background: #f8fff9 !important;
   margin-top: 8px;
-  padding-top: 12px;
+  padding: 12px 8px;
   font-size: 16px;
+  color: #28a745 !important;
+  border-radius: 6px;
 }
 
+.total-row strong {
+  color: #28a745 !important;
+}
+
+/* ✅ BOTONES DE CONFIRMACIÓN */
 .confirmation-form-buttons {
   margin-top: 24px;
   display: flex;
@@ -1209,66 +1150,54 @@ ion-chip {
 .cancel-form-button {
   height: 48px;
   font-weight: 600;
+  --background: #ffffff !important;
+  --color: #6c757d !important;
+  --border-color: #6c757d !important;
 }
 
 .confirm-form-button {
   height: 48px;
   font-weight: 600;
+  --background: #28a745 !important;
+  --color: #ffffff !important;
 }
 
-/* ✅ ESTILOS PARA EL ALERT DE ÉXITO */
-:deep(.success-alert-class) {
-  --background: #ffffff;
-  --border-radius: 12px;
-  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+.confirm-form-button:disabled {
+  --background: #e9ecef !important;
+  --color: #6c757d !important;
 }
 
-:deep(.success-alert-class .alert-title) {
-  font-size: 18px;
-  font-weight: bold;
-  color: #28a745 !important;
+/* ✅ FORZAR MODO CLARO EN TODO EL MODAL DE CONFIRMACIÓN */
+ion-modal[aria-labelledby*="Confirmar"] {
+  --background: #f8f9fa !important;
 }
 
-:deep(.success-alert-class .alert-message) {
-  font-size: 16px;
-  color: #666 !important;
-  margin: 8px 0;
+ion-modal[aria-labelledby*="Confirmar"] ion-content {
+  --background: #f8f9fa !important;
+  --color: #333333 !important;
 }
 
-:deep(.success-alert-class .alert-button) {
-  font-weight: 600;
-  color: #28a745 !important;
+ion-modal[aria-labelledby*="Confirmar"] .page-title {
+  color: #333333 !important;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ✅ OVERRIDE ESPECÍFICO PARA ELEMENTOS PROBLEMÁTICOS */
+.form-card *,
+.voucher-section * {
+  color: #333333 !important;
 }
 
-/* ✅ ANIMACIONES PARA EL MENSAJE DE ÉXITO */
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.form-card ion-radio::part(container) {
+  border-color: #007bff !important;
 }
 
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+.form-card ion-radio::part(mark) {
+  background: #007bff !important;
+}
+
+/* ✅ INPUT FILE OCULTO (por si acaso) */
+input[type="file"] {
+  background: #ffffff !important;
+  color: #333333 !important;
 }
 </style>
