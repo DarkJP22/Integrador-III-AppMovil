@@ -117,7 +117,7 @@
       </ion-toolbar>
     </ion-footer>
 
-    <!-- MODAL DE REVISIÓN -->
+    <!-- ✅ MODAL DE REVISIÓN CON OPCIONES DE ENVÍO -->
     <ion-modal :is-open="isModalOpen" @will-dismiss="closeModal">
       <ion-header>
         <ion-toolbar color="primary">
@@ -130,77 +130,137 @@
         </ion-toolbar>
       </ion-header>
       
-      <ion-content class="modal-content">
-        <div class="ion-padding">
-          <div v-if="orderToReview">
+      <ion-content>
+        <div class="ion-padding" v-if="orderToReview">
+          
+          <h1 class="page-title">Revisar tu Orden</h1>
+
+          <!-- MEDICAMENTOS SELECCIONADOS -->
+          <ion-card class="order-detail-card">
+            <ion-card-content>
+              <h3>Medicamentos Seleccionados</h3>
+              
+              <div v-for="(detail, index) in orderToReview.details" :key="index" class="medication-item">
+                <div class="medication-header">
+                  <h4>{{ detail.description.split(' - ')[0] }}</h4>
+                  <div class="quantity-badge">
+                    {{ detail.requested_amount }}
+                  </div>
+                </div>
+                
+                <p class="medication-description">{{ detail.description.split(' - ')[1] }}</p>
+                <div class="medication-info">
+                  <p><strong>Cantidad solicitada:</strong> {{ detail.requested_amount }} unidades</p>
+                </div>
+                
+                <hr v-if="index < orderToReview.details.length - 1">
+              </div>
+              
+            </ion-card-content>
+          </ion-card>
+
+          <!-- ✅ NUEVA SECCIÓN: OPCIONES DE ENTREGA -->
+          <ion-card class="order-detail-card">
+            <ion-card-content>
+              <h3>Opciones de Entrega</h3>
+              
+              <ion-item>
+                <ion-checkbox 
+                  v-model="requiresShipping" 
+                  @ion-change="onShippingChange"
+                ></ion-checkbox>
+                <ion-label class="ion-margin-start">
+                  <h4>Requiero envío a domicilio</h4>
+                  <p>Si no lo marcas, deberás recoger en la farmacia</p>
+                </ion-label>
+              </ion-item>
+
+              <!-- SECCIÓN DE DIRECCIÓN (SI REQUIERE ENVÍO) -->
+              <div v-if="requiresShipping" class="shipping-section">
+                <ion-item>
+                  <ion-label position="stacked">Dirección de entrega</ion-label>
+                  <ion-textarea
+                    v-model="deliveryAddress"
+                    placeholder="Escribe la dirección completa donde quieres recibir tu pedido..."
+                    :rows="3"
+                    :maxlength="255"
+                  ></ion-textarea>
+                </ion-item>
+
+                <!-- BOTÓN PARA COORDENADAS GPS -->
+                <ion-item>
+                  <ion-label>
+                    <h4>Ubicación GPS</h4>
+                    <p v-if="!coordinates && !gettingLocation">Opcional: Tomar coordenadas actuales</p>
+                    <p v-else-if="gettingLocation" class="coordinates-status">Obteniendo ubicación...</p>
+                    <p v-else-if="coordinates" class="coordinates-display">
+                      📍 Lat: {{ coordinates.lat.toFixed(6) }}, Lng: {{ coordinates.lng.toFixed(6) }}
+                    </p>
+                  </ion-label>
+                  <ion-button 
+                    slot="end" 
+                    fill="outline" 
+                    size="small"
+                    @click="getCurrentLocation"
+                    :disabled="gettingLocation"
+                  >
+                    <ion-icon 
+                      :name="gettingLocation ? 'sync' : 'location'" 
+                      slot="start"
+                      :class="{ 'spinning': gettingLocation }"
+                    ></ion-icon>
+                    {{ gettingLocation ? 'Obteniendo...' : 'Tomar GPS' }}
+                  </ion-button>
+                </ion-item>
+              </div>
+
+            </ion-card-content>
+          </ion-card>
+
+          <!-- RESUMEN -->
+          <ion-card class="order-detail-card">
+            <ion-card-content>
+              <h3>Resumen de la Orden</h3>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <span class="label">Total de medicamentos:</span>
+                  <span>{{ orderToReview.details.length }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Total de unidades:</span>
+                  <span class="total-amount">{{ totalUnits }} unidades</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Tipo de entrega:</span>
+                  <span>{{ requiresShipping ? 'Envío a domicilio' : 'Recogida en farmacia' }}</span>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- BOTONES CON VALIDACIÓN -->
+          <div class="confirmation-buttons">
+            <ion-button 
+              expand="block" 
+              color="primary" 
+              class="confirm-button"
+              @click="submitOrder"
+              :disabled="!isOrderValid"
+            >
+              Confirmar y Enviar Orden
+            </ion-button>
             
-            <h1 class="page-title">Revisar tu Orden</h1>
-
-            <!-- MEDICAMENTOS SELECCIONADOS -->
-            <ion-card class="drugs-card">
-              <ion-card-content>
-                <h2 class="section-title">Medicamentos Seleccionados</h2>
-                
-                <div v-for="(detail, index) in orderToReview.details" :key="index" class="medicamento-modal-item">
-                  <div class="drug-header">
-                    <h3 class="drug-name">{{ detail.description.split(' - ')[0] }}</h3>
-                    <div class="quantity-badge">
-                      {{ detail.requested_amount }}
-                    </div>
-                  </div>
-                  
-                  <p class="drug-presentation">{{ detail.description.split(' - ')[1] }}</p>
-                  <p class="drug-quantity-text">
-                    <strong>Cantidad solicitada:</strong> {{ detail.requested_amount }} unidades
-                  </p>
-                  
-                  <div v-if="index < orderToReview.details.length - 1" class="separator"></div>
-                </div>
-                
-              </ion-card-content>
-            </ion-card>
-
-            <!-- RESUMEN -->
-            <ion-card class="summary-card">
-              <ion-card-content>
-                <div class="resumen">
-                  <h2 class="section-title">Resumen de la Orden</h2>
-                  <div class="summary-grid">
-                    <div class="summary-item">
-                      <span class="summary-label">Total de medicamentos:</span>
-                      <span class="summary-value">{{ orderToReview.details.length }}</span>
-                    </div>
-                    <div class="summary-item">
-                      <span class="summary-label">Total de unidades:</span>
-                      <span class="summary-value-main">{{ totalUnits }} unidades</span>
-                    </div>
-                  </div>
-                </div>
-              </ion-card-content>
-            </ion-card>
-
-            <!-- BOTONES -->
-            <div class="modal-buttons">
-              <ion-button 
-                expand="block" 
-                fill="outline" 
-                color="medium" 
-                @click="closeModal"
-                class="cancel-btn"
-              >
-                Cancelar
-              </ion-button>
-              <ion-button 
-                expand="block" 
-                color="primary" 
-                @click="submitOrder"
-                class="confirm-btn"
-              >
-                Confirmar y Enviar Orden
-              </ion-button>
-            </div>
-
+            <ion-button 
+              expand="block" 
+              fill="outline" 
+              color="medium" 
+              @click="closeModal"
+              class="cancel-button"
+            >
+              Cancelar
+            </ion-button>
           </div>
+
         </div>
       </ion-content>
     </ion-modal>
@@ -221,16 +281,18 @@
 import { 
   IonPage, IonHeader, IonToolbar, IonButtons, IonTitle, IonContent,
   IonBackButton, IonCard, IonCardContent, IonButton, IonSearchbar,
-  IonFooter, IonModal, IonAlert, IonIcon
+  IonFooter, IonModal, IonAlert, IonIcon, IonCheckbox, IonItem,
+  IonLabel, IonTextarea
 } from '@ionic/vue';
 import { receiptSharp } from 'ionicons/icons';
 import { defineComponent, onMounted, ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { Geolocation } from '@capacitor/geolocation';
 import useAuth from '../../auth/composables/useAuth';
 
 const URL = import.meta.env.VITE_API_URL;
 
-// INTERFAZ
+// INTERFACES
 interface Drug {
   id: number;
   name: string;
@@ -238,12 +300,18 @@ interface Drug {
   presentation: string;
 }
 
+interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
 export default defineComponent({
   name: 'DrugsPage',
   components: {
     IonPage, IonHeader, IonToolbar, IonButtons, IonTitle, IonContent,
     IonBackButton, IonCard, IonCardContent, IonButton, IonSearchbar,
-    IonFooter, IonModal, IonAlert, IonIcon
+    IonFooter, IonModal, IonAlert, IonIcon, IonCheckbox, IonItem,
+    IonLabel, IonTextarea
   },
   
   setup() {
@@ -255,6 +323,12 @@ export default defineComponent({
     const orderToReview = ref<any>(null);
     const showSuccessAlert = ref(false);
     const orderResult = ref<any>(null);
+
+    // ✅ NUEVAS VARIABLES PARA ENVÍO
+    const requiresShipping = ref(false);
+    const deliveryAddress = ref('');
+    const coordinates = ref<Coordinates | null>(null);
+    const gettingLocation = ref(false);
 
     // CONFIGURACIÓN
     const { auth } = useAuth();
@@ -290,7 +364,13 @@ export default defineComponent({
       );
     });
 
-    // FUNCIONES DE CANTIDAD
+    // ✅ VALIDACIÓN DE LA ORDEN
+    const isOrderValid = computed(() => {
+      if (!requiresShipping.value) return true;
+      return deliveryAddress.value.trim().length > 10;
+    });
+
+    // FUNCIONES DE CANTIDAD (sin cambios)
     const getQuantity = (drugId: number): number => 
       quantities.value[drugId] || 0;
 
@@ -310,7 +390,45 @@ export default defineComponent({
     const clearQuantity = (drugId: number) => 
       setQuantity(drugId, 0);
 
-    // FUNCIONES PRINCIPALES
+    // ✅ NUEVAS FUNCIONES PARA ENVÍO
+    const onShippingChange = () => {
+      if (!requiresShipping.value) {
+        deliveryAddress.value = '';
+        coordinates.value = null;
+      }
+    };
+
+    const getCurrentLocation = async (): Promise<void> => {
+      try {
+        gettingLocation.value = true;
+
+        const permission = await Geolocation.checkPermissions();
+        if (permission.location !== 'granted') {
+          const requestPermission = await Geolocation.requestPermissions();
+          if (requestPermission.location !== 'granted') {
+            alert('Se necesitan permisos de ubicación para usar esta función');
+            return;
+          }
+        }
+
+        const position = await Geolocation.getCurrentPosition({
+          enableHighAccuracy: true,
+          timeout: 15000
+        });
+
+        coordinates.value = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+
+      } catch (error) {
+        alert('No se pudo obtener la ubicación. Verifica que el GPS esté activado.');
+      } finally {
+        gettingLocation.value = false;
+      }
+    };
+
+    // FUNCIONES PRINCIPALES ACTUALIZADAS
     const loadDrugs = async () => {
       try {
         const response = await fetch(`${URL}/drugs`);
@@ -347,10 +465,10 @@ export default defineComponent({
           pharmacy_id: Number(pharmacyId),
           user_id: userId,
           payment_method: false,
-          requires_shipping: false,
-          address: "",
-          lat: 9.9281,
-          lot: -84.0907,
+          requires_shipping: requiresShipping.value ? 1 : 0, // ✅ 1 o 0
+          address: requiresShipping.value ? deliveryAddress.value : "",
+          lat: coordinates.value ? coordinates.value.lat : 9.9281,
+          lot: coordinates.value ? coordinates.value.lng : -84.0907,
           shipping_total: 0,
           details
         };
@@ -374,10 +492,18 @@ export default defineComponent({
     const closeModal = () => {
       isModalOpen.value = false;
       orderToReview.value = null;
+      // ✅ Resetear variables de envío
+      requiresShipping.value = false;
+      deliveryAddress.value = '';
+      coordinates.value = null;
     };
 
     const submitOrder = async () => {
-      if (!orderToReview.value) return;
+      if (!orderToReview.value || !isOrderValid.value) return;
+
+      // ✅ Actualizar orden con datos actuales antes de enviar
+      const updatedOrder = createOrder();
+      if (!updatedOrder) return;
 
       try {
         const response = await fetch(`${URL}/orders`, {
@@ -386,7 +512,7 @@ export default defineComponent({
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          body: JSON.stringify(orderToReview.value)
+          body: JSON.stringify(updatedOrder)
         });
 
         if (response.ok) {
@@ -435,7 +561,7 @@ export default defineComponent({
 
     // RETURN
     return {
-      // Estado
+      // Estado existente
       drugs,
       searchTerm,
       isModalOpen,
@@ -443,13 +569,20 @@ export default defineComponent({
       showSuccessAlert,
       orderResult,
       
+      // ✅ Nuevas variables de envío
+      requiresShipping,
+      deliveryAddress,
+      coordinates,
+      gettingLocation,
+      
       // Computed
       filteredDrugs,
       selectedDrugsCount,
       hasSelectedDrugs,
       totalUnits,
+      isOrderValid,
       
-      // Funciones
+      // Funciones existentes
       getQuantity,
       increaseQuantity,
       decreaseQuantity,
@@ -460,6 +593,10 @@ export default defineComponent({
       submitOrder,
       closeSuccessAlert,
       goToOrders,
+      
+      // ✅ Nuevas funciones de envío
+      onShippingChange,
+      getCurrentLocation,
       
       // Iconos
       receiptSharp
@@ -483,7 +620,7 @@ export default defineComponent({
   text-align: center;
   font-size: 20px;
   font-weight: bold;
-  color: #ffffff;
+  color: #333;
   margin: 16px 0;
 }
 
@@ -510,8 +647,8 @@ export default defineComponent({
 .drug-name {
   font-size: 18px;
   font-weight: bold;
-  color: #333;
   margin: 0;
+  color: #333;
 }
 
 .quantity-badge {
@@ -596,99 +733,41 @@ export default defineComponent({
   font-size: 16px;
 }
 
-.modal-content {
-  --background: linear-gradient(135deg, #cdd1e6 0%, #8bb6ee 100%);
-}
-
-.info-card, .drugs-card, .summary-card {
-  background: #ffffff;
-  border-radius: 12px;
+.order-detail-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  color: #333;
   margin: 12px 0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
 }
 
-.section-title {
+.order-detail-card h3 {
   font-size: 18px;
   font-weight: bold;
   color: #333;
   margin: 0 0 16px 0;
-  text-align: center;
+  text-align: left;
 }
 
-.info-section {
-  text-align: center;
-}
-
-.info-grid {
-  display: grid;
-  gap: 12px;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.info-item:last-child {
-  border-bottom: none;
-}
-
-.info-label {
-  font-weight: 500;
-  color: #666;
-  font-size: 14px;
-}
-
-.info-value {
-  color: #333;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.info-value-highlight {
-  background: #28a745;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.medicamento-modal-item {
+.medication-item {
   margin-bottom: 16px;
 }
 
-.medicamento-modal-item .drug-header {
+.medication-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
 
-.medicamento-modal-item .drug-name {
+.medication-header h4 {
   font-size: 16px;
   font-weight: bold;
-  color: #333;
   margin: 0;
+  color: #333;
 }
 
-.medicamento-modal-item .quantity-badge {
-  background: #28a745;
-  color: white;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.medicamento-modal-item .drug-presentation {
+.medication-description {
   background: #f0f0f0;
   color: #666;
   padding: 4px 8px;
@@ -698,77 +777,191 @@ export default defineComponent({
   display: inline-block;
 }
 
-.drug-quantity-text {
-  color: #666;
+.medication-info p {
   font-size: 14px;
-  margin: 8px 0 0 0;
+  margin: 4px 0;
+  color: #333;
 }
 
-.separator {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #ddd, transparent);
-  margin: 16px 0;
-}
-
-.resumen {
-  text-align: center;
-}
-
-.summary-grid {
+.detail-grid {
   display: grid;
   gap: 12px;
+  margin-top: 16px;
 }
 
-.summary-item {
+.detail-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.summary-label {
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.label {
   font-weight: 500;
-  color: #666;
   font-size: 14px;
-}
-
-.summary-value {
   color: #333;
-  font-weight: 600;
-  font-size: 14px;
 }
 
-.summary-value-main {
-  background: #007bff;
-  color: white;
-  padding: 6px 16px;
-  border-radius: 20px;
+.total-amount {
   font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
+  color: #333;
 }
 
-.modal-buttons {
+.confirmation-buttons {
   margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 0 4px;
+  padding: 16px 0;
 }
 
-.cancel-btn {
-  --border-radius: 12px;
+.confirm-button {
+  margin-bottom: 12px;
   height: 48px;
   font-weight: 600;
 }
 
-.confirm-btn {
-  --border-radius: 12px;
+.cancel-button {
+  margin-bottom: 0;
   height: 48px;
   font-weight: 600;
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
 }
 
-/* ✅ ESTILOS ACTUALIZADOS PARA EL ALERT - IGUAL QUE ORDERSPAGE */
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 16px 0;
+}
+
+.modal-content {
+  --background: #f8f9fa;
+}
+
+/* ✅ NUEVOS ESTILOS PARA OPCIONES DE ENVÍO */
+.shipping-section {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f8f9fa !important; /* Forzar fondo claro */
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+/* Forzar colores claros en los items dentro de shipping-section */
+.shipping-section ion-item {
+  --background: #ffffff !important;
+  --color: #333333 !important;
+  --border-color: #e9ecef !important;
+}
+
+/* Labels dentro de shipping-section */
+.shipping-section ion-label {
+  --color: #333333 !important;
+}
+
+.shipping-section ion-label h4 {
+  color: #333333 !important;
+}
+
+.shipping-section ion-label p {
+  color: #666666 !important;
+}
+
+/* Textarea dentro de shipping-section */
+.shipping-section ion-textarea {
+  --background: #ffffff !important;
+  --color: #333333 !important;
+  --placeholder-color: #999999 !important;
+  --border-color: #e9ecef !important;
+}
+
+/* Botones dentro de shipping-section */
+.shipping-section ion-button {
+  --background: #ffffff !important;
+  --color: #007bff !important;
+  --border-color: #007bff !important;
+}
+
+/* Checkbox */
+.order-detail-card ion-item ion-checkbox {
+  --background-checked: #28a745 !important;
+  --border-color-checked: #28a745 !important;
+  --checkmark-color: #ffffff !important;
+}
+
+/* Forzar colores para el card de opciones de entrega */
+.order-detail-card {
+  background: #ffffff !important;
+  border: 1px solid #dee2e6;
+  color: #333333 !important;
+  margin: 12px 0;
+  border-radius: 12px;
+}
+
+.order-detail-card ion-card-content {
+  --background: #ffffff !important;
+  --color: #333333 !important;
+}
+
+.order-detail-card h3 {
+  color: #333333 !important;
+}
+
+/* Items dentro del card */
+.order-detail-card ion-item {
+  --background: #ffffff !important;
+  --color: #333333 !important;
+  --border-color: #e9ecef !important;
+}
+
+.order-detail-card ion-label {
+  --color: #333333 !important;
+}
+
+.order-detail-card ion-label h4 {
+  color: #333333 !important;
+}
+
+.order-detail-card ion-label p {
+  color: #666666 !important;
+}
+
+/* Estados específicos para coordenadas */
+.coordinates-status {
+  color: #007bff !important;
+  font-style: italic;
+  margin: 0;
+}
+
+.coordinates-display {
+  color: #28a745 !important;
+  font-weight: 500;
+  margin: 0;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Validación visual */
+ion-textarea.ion-invalid {
+  --border-color: #dc3545;
+}
+
+ion-textarea.ion-valid {
+  --border-color: #28a745;
+}
+
+/* ESTILOS PARA EL ALERT */
 :deep(.success-alert-class) {
   --background: #ffffff;
   --border-radius: 12px;

@@ -85,6 +85,15 @@
 
             <ion-col class="" size-md="12" size-lg="12" size-xs="12"> </ion-col>
           </ion-row>
+
+                    <ion-row class="ion-justify-content-center ion-align-items-center">
+            <ion-col class="" size-md="12" size-lg="12" size-xs="12">
+              <ion-button :color="darkModeActive ? 'primary' : 'light'" expand="block" size="large" shape="round" @click="goToPharmacies">
+                Farmacias <ion-badge slot="end" color="danger" class="ion-margin-start" v-if="notificationsLabresults.length">{{ notificationsLabresults.length }}</ion-badge></ion-button>
+            </ion-col>
+
+            <ion-col class="" size-md="12" size-lg="12" size-xs="12"> </ion-col>
+          </ion-row>
         </ion-grid>
       </div>
       <LoginModal v-model:is-open="openLoginModal"></LoginModal>
@@ -159,6 +168,16 @@ const goToExpedient = () => {
   } else {
 
     router.push({ name: 'expedient' });
+  }
+};
+const goToPharmacies = () => {
+  if (isGuest.value) {
+    // alertMessage('Autentificación', 'Necesitas REGISTRARTE COMO PACIENTE para ver esta sección. Si ya tienes una cuenta inicia sesión', 'Ingresar', goToAuth, 'Despues');
+    openLoginModal.value = true;
+
+  } else {
+
+    router.push({ name: 'branches' });
   }
 };
 watch(auth, async (newVal) => {
