@@ -189,7 +189,7 @@ export default defineComponent({
       try {
         loadingMessage.value = 'Buscando farmacias cercanas...';
 
-        const url = `${URL}/api/pharmacies?lat=${userLocation.value.lat}&lon=${userLocation.value.lon}&max_distance=${maxDistance.value}`;
+        const url = `${URL}/pharmacies?lat=${userLocation.value.lat}&lon=${userLocation.value.lon}&max_distance=${maxDistance.value}`;
 
         const response = await fetch(url, {
           method: 'GET',
