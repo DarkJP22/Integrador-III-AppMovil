@@ -136,6 +136,8 @@ interface Pharmacy {
   distance: string;
 }
 
+const URL = import.meta.env.VITE_API_URL;
+
 // CONSTANTES
 const DEFAULT_LOCATION = { lat: 9.9281, lon: -84.0907 }; // San José, Costa Rica
 const DEFAULT_MAX_DISTANCE = 15; // km
@@ -187,7 +189,7 @@ export default defineComponent({
       try {
         loadingMessage.value = 'Buscando farmacias cercanas...';
 
-        const url = `http://127.0.0.1:8000/api/pharmacies?lat=${userLocation.value.lat}&lon=${userLocation.value.lon}&max_distance=${maxDistance.value}`;
+        const url = `${URL}/api/pharmacies?lat=${userLocation.value.lat}&lon=${userLocation.value.lon}&max_distance=${maxDistance.value}`;
 
         const response = await fetch(url, {
           method: 'GET',
